@@ -16,7 +16,13 @@ classifiers = [
 ]
 
 keywords = [ "CKAN", "RAG", "semantic-search", "knowledge-assistant", "llama-index", ]
-dependencies = []
+dependencies = [
+    "llama-index-core",
+    "llama-index-llms-ollama",
+    "llama-index-tools-mcp",
+    "llama-index-vector-stores-postgres",
+    "llama-index-embeddings-ollama"
+]
 
 [project.urls]
 Homepage = "https://github.com/DataShades/ckanext-knowledge-assistant"
@@ -42,4 +48,3 @@ line-length = 127
 
 [tool.ruff.lint]
 select = ["E", "F", "W"]
-

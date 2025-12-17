@@ -1,0 +1,14 @@
+# knowledge_assistant-js:
+#   filter: rjsmin
+#   output: ckanext-knowledge_assistant/%(version)s-knowledge_assistant.js
+#   contents:
+#     - js/knowledge_assistant.js
+#   extra:
+#     preload:
+#       - base/main
+
+# knowledge_assistant-css:
+#   filter: cssrewrite
+#   output: ckanext-knowledge_assistant/%(version)s-knowledge_assistant.css
+#   contents:
+#     - css/knowledge_assistant.css

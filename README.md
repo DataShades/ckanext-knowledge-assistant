@@ -2,15 +2,15 @@
 
 # ckanext-knowledge-assistant
 
-**TODO:** Put a description of your extension here:  What does it do? What features does it have? Consider including some screenshots or embedding a video!
+RAG-based knowledge assistant for CKAN - semantic search over datasets using natural language queries.
 
 
 ## Requirements
 
-**TODO:** For example, you might want to mention here which versions of CKAN this
-extension works with.
-
-If your extension works across different versions you can add the following table:
+- CKAN >= 2.10
+- Python >= 3.10
+- PostgreSQL with pgvector extension
+- Ollama (for local models) OR OpenAI API key
 
 Compatibility with core CKAN versions:
 
@@ -18,7 +18,7 @@ Compatibility with core CKAN versions:
 | --------------- | ------------- |
 | 2.9 and earlier | not tested    |
 | 2.10            | not tested    |
-| 2.11            | not tested    |
+| 2.11            | yes           |
 
 Suggested values:
 
@@ -30,42 +30,109 @@ Suggested values:
 
 ## Installation
 
-**TODO:** Add any additional install steps to the list below.
-   For example installing any non-Python dependencies or adding any required
-   config settings.
+### 1. Install pgvector
+```bash
+# Ubuntu/Debian
+sudo apt-get install postgresql-15-pgvector
 
-To install ckanext-knowledge-assistant:
+# Or from source
+cd /tmp
+git clone --branch v0.7.0 https://github.com/pgvector/pgvector.git
+cd pgvector
+make
+sudo make install
+```
 
-1. Activate your CKAN virtual environment, for example:
+### 2. Enable pgvector in your database
+```bash
+sudo -u postgres psql -d your_ckan_db -c "CREATE EXTENSION vector;"
+```
 
-     . /usr/lib/ckan/default/bin/activate
+### 3. Install Ollama (for local models)
+```bash
+# macOS
+brew install ollama
 
-2. Clone the source and install it on the virtualenv
+# Linux
+curl -fsSL https://ollama.com/install.sh | sh
 
-    git clone https://github.com/DataShades/ckanext-knowledge-assistant.git
-    cd ckanext-knowledge-assistant
-    pip install -e .
-	pip install -r requirements.txt
+# Pull models
+ollama pull qwen3:8b-q4_K_M
+ollama pull nomic-embed-text
+```
 
-3. Add `knowledge-assistant` to the `ckan.plugins` setting in your CKAN
-   config file (by default the config file is located at
-   `/etc/ckan/default/ckan.ini`).
+### 4. Install ckanext-knowledge-assistant
 
-4. Restart CKAN. For example if you've deployed CKAN with Apache on Ubuntu:
+Activate your CKAN virtual environment:
+```bash
+. /usr/lib/ckan/default/bin/activate
+```
 
-     sudo service apache2 reload
+Clone the source and install it on the virtualenv:
+```bash
+git clone https://github.com/DataShades/ckanext-knowledge-assistant.git
+cd ckanext-knowledge-assistant
+pip install -e .
+pip install -r requirements.txt
+```
+
+### 5. Configure CKAN
+
+Add `knowledge_assistant` to the `ckan.plugins` setting in your CKAN config file (by default the config file is located at `/etc/ckan/default/ckan.ini`).
+
+Add the following configuration settings:
+```ini
+# LLM Configuration
+ckanext.knowledge_assistant.llm_provider = ollama
+ckanext.knowledge_assistant.llm_model = qwen3:8b-q4_K_M
+ckanext.knowledge_assistant.ollama_base_url = http://localhost:11434
+
+# Embedding Configuration
+ckanext.knowledge_assistant.embedding_provider = ollama
+ckanext.knowledge_assistant.embedding_model = nomic-embed-text
+
+# Vector Store (optional - defaults to CKAN's database)
+# ckanext.knowledge_assistant.vector_store_url = postgresql://user:pass@localhost/ckan
+ckanext.knowledge_assistant.vector_store_table = knowledge_assistant_embeddings
+
+# Query Settings
+ckanext.knowledge_assistant.similarity_top_k = 5
+```
+
+### 6. Restart CKAN
+
+For example if you've deployed CKAN with Apache on Ubuntu:
+```bash
+sudo service apache2 reload
+```
+
+### 7. Index your datasets
+```bash
+ckan -c /etc/ckan/default/ckan.ini knowledge-assistant index
+```
 
 
-## Config settings
+## Usage
 
-None at present
+### CLI Commands
 
-**TODO:** Document any optional config settings here. For example:
+**Index datasets:**
+```bash
+# Initial indexing
+ckan knowledge-assistant index
 
-	# The minimum number of hours to wait before re-checking a resource
-	# (optional, default: 24).
-	ckanext.knowledge_assistant.some_setting = some_default_value
+# Re-index (clears existing data)
+ckan knowledge-assistant index --force
+```
 
+**Test queries:**
+```bash
+# Interactive mode
+ckan knowledge-assistant test-query
+
+# Direct query
+ckan knowledge-assistant test-query -q "Show me datasets about soil"
+```
 
 ## Developer installation
 

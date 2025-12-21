@@ -1,0 +1,62 @@
+version: 1
+groups:
+  - annotation: Knowledge Assistant Configuration
+    options:
+      - key: ckanext.knowledge_assistant.enabled
+        type: bool
+        default: true
+        description: |
+          Enable or disable the knowledge assistant feature
+
+      - key: ckanext.knowledge_assistant.llm_provider
+        example: ollama
+        default: ollama
+        description: |
+          LLM provider to use (ollama or openai)
+
+      - key: ckanext.knowledge_assistant.llm_model
+        example: qwen3:8b-q4_K_M
+        default: qwen3:8b-q4_K_M
+        description: |
+          LLM model name to use for generating responses
+
+      - key: ckanext.knowledge_assistant.embedding_provider
+        example: ollama
+        default: ollama
+        description: |
+          Embedding provider to use (ollama or openai)
+
+      - key: ckanext.knowledge_assistant.embedding_model
+        example: nomic-embed-text
+        default: nomic-embed-text
+        description: |
+          Embedding model name for generating vector embeddings
+
+      - key: ckanext.knowledge_assistant.ollama_base_url
+        example: http://localhost:11434
+        default: http://localhost:11434
+        description: |
+          Base URL for Ollama server
+
+      - key: ckanext.knowledge_assistant.openai_api_key
+        example: sk-...
+        description: |
+          OpenAI API key (only required if using openai provider)
+
+      - key: ckanext.knowledge_assistant.vector_store_url
+        example: postgresql://username:password@localhost:5432/ckan
+        description: |
+          PostgreSQL connection string for vector store.
+          Defaults to CKAN's main database URL if not specified.
+
+      - key: ckanext.knowledge_assistant.vector_store_table
+        example: knowledge_assistant_embeddings
+        default: knowledge_assistant_embeddings
+        description: |
+          Table name for storing vector embeddings
+
+      - key: ckanext.knowledge_assistant.similarity_top_k
+        type: int
+        default: 5
+        description: |
+          Number of similar documents to retrieve for each query
